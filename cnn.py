@@ -1,1 +1,0 @@
-# Continuacao do projeto PIBITI, agora utilizando CNN
