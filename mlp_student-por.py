@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
+import theano
+import theano.tensor as T
 
 # Read the data
 students_data = pd.read_csv('student-por.csv', sep=';', true_values=['yes'], false_values=['no'])
@@ -33,7 +35,7 @@ axes[0].set_title("Distribuição de G3")
 sns.countplot(x="PassFail", data=students_data, ax=axes[1])
 axes[1].set_title("Distribuição entre Aprovados/Reprovados")
 plt.grid(True, axis='y')
-plt.show()
+# plt.show()
 
 # Separate target from predictors
 Y = students_data.PassFail
@@ -50,13 +52,19 @@ def scale_numeric(data, numeric_columns, scaler):
 scaler = StandardScaler()
 X = scale_numeric(X, [cname for cname in X.columns if X[cname].dtype in ['int64', 'float64']], scaler)
 
-# Divide data into training and validation subsets
-X_train_full, X_valid_full, Y_train, Y_valid = train_test_split(X, Y, train_size=0.8, test_size=0.2, stratify=Y,
-                                                                shuffle=True)
-# Get shape of test and training sets
+# Divide data into training, validation and test subsets
+X_train_full, X_valid_full, Y_train, Y_valid = train_test_split(X, Y, train_size=0.8, test_size=0.2, shuffle=True)
+X_valid_full, X_test_full, Y_valid, Y_test = train_test_split(X_valid_full, Y_valid, train_size=0.8, test_size=0.2,
+                                                              shuffle=True)
+# Get shape of training, validation and test sets
 print('Training Set:')
 print('Number of datapoints: ', X_train_full.shape[0])
 print('Number of features: ', X_train_full.shape[1])
-print('Test Set:')
+print('Validation Set:')
 print('Number of datapoints: ', X_valid_full.shape[0])
 print('Number of features: ', X_valid_full.shape[1])
+print('Test Set:')
+print('Number of datapoints: ', X_test_full.shape[0])
+print('Number of features: ', X_test_full.shape[1])
+
+
