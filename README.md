@@ -8,4 +8,6 @@ Data 03/03/2020\
         Leitura dos dados no arquivo mlp_studen-por.py\
 Data 04/03/2020\
     Dividir o teste em 3 partes fazendo dois splits (train/valid) e (valid/test)
-    Retornar ao capitulo 3 para enteder melhor a otimização
+    Retornar ao capitulo 3 para enteder melhor a otimização\
+Data 05/03/2020\
+    Fazer a trasformada das variáveis classificatórias e testar fit_transform
