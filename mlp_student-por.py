@@ -85,10 +85,13 @@ X_valid, X_test, Y_valid, Y_test = train_test_split(X_valid, Y_valid, train_size
 
 X_train = theano.shared(numpy.asarray(X_train, dtype=theano.config.floatX))
 Y_train = theano.shared(numpy.asarray(Y_train, dtype=theano.config.floatX))
+Y_train = T.cast(Y_train, 'int64').flatten()
 X_valid = theano.shared(numpy.asarray(X_valid, dtype=theano.config.floatX))
 Y_valid = theano.shared(numpy.asarray(Y_valid, dtype=theano.config.floatX))
+Y_valid = T.cast(Y_valid, 'int64').flatten()
 X_test = theano.shared(numpy.asarray(X_test, dtype=theano.config.floatX))
 Y_test = theano.shared(numpy.asarray(Y_test, dtype=theano.config.floatX))
+Y_test = T.cast(Y_test, 'int64').flatten()
 
 rval = [(X_train, Y_train), (X_valid, Y_valid), (X_test, Y_test)]
 
@@ -103,8 +106,11 @@ n_test_batches = test_set_x.get_value(borrow=True).shape[0] // batch_size
 print('... building the model')
 
 index = T.lscalar()  # index to a [mini]batch
-x = T.matrix('x')
-y = T.ivector('y')
+print(index.type)
+x = T.matrix(name='x')
+print(x.type)
+y = T.lvector(name='y')
+print(y.type)
 rng = numpy.random.RandomState(1234)
 
 
@@ -391,7 +397,7 @@ class MLP(object):
 
 
 n_hidden = 500
-classifier = MLP(rng=rng, input=x, n_in=28 * 28, n_hidden=n_hidden, n_out=10)
+classifier = MLP(rng=rng, input=x, n_in=28*28, n_hidden=n_hidden, n_out=10)
 L1_reg = 0.00
 L2_reg = 0.0001
 cost = (classifier.negative_log_likelihood(y) + L1_reg * classifier.L1 + L2_reg * classifier.L2_sqr)
