@@ -76,8 +76,8 @@ preprocessor = ColumnTransformer(
         ('cat', categorical_transformer, students_cat_cols),
         ('bool', 'passthrough', students_bool_cols)])
 
-X = pd.DataFrame(preprocessor.fit_transform(X)).astype('int32')
-Y = pd.DataFrame(Y).astype('int32')
+X = pd.DataFrame(preprocessor.fit_transform(X))
+Y = pd.DataFrame(Y)
 
 # Divide data into training, validation and test subsets
 X_train, X_valid, Y_train, Y_valid = train_test_split(X, Y, train_size=0.8, test_size=0.2, shuffle=True)
@@ -104,9 +104,7 @@ print('... building the model')
 
 index = T.lscalar()  # index to a [mini]batch
 x = T.matrix('x')
-print(x.type)
 y = T.ivector('y')
-print(y.type)
 rng = numpy.random.RandomState(1234)
 
 
