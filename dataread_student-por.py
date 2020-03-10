@@ -130,7 +130,7 @@ dataset = [(tr_set_x, tr_set_y), (val_set_x, val_set_y), (te_set_x, te_set_y)]
 # TUDO CERTO ATÉ AQUI ==================================================================================================
 
 
-def test_mlp(datasets, learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000, batch_size=20, n_hidden=500):
+def test_mlp(datasets, learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000, batch_size=1, n_hidden=500):
     """
     Demonstrate stochastic gradient descent optimization for a multilayer
     perceptron
