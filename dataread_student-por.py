@@ -111,7 +111,7 @@ def shared_dataset(data_xy, borrow=True):
                              borrow=borrow)
     shared_y = theano.shared(numpy.asarray(data_y,
                                            dtype=theano.config.floatX),
-                             borrow=borrow)
+                             borrow=borrow).flatten()
     # When storing data on the GPU it has to be stored as floats
     # therefore we will store the labels as ``floatX`` as well
     # (``shared_y`` does exactly that). But during our computations
@@ -130,7 +130,7 @@ dataset = [(tr_set_x, tr_set_y), (val_set_x, val_set_y), (te_set_x, te_set_y)]
 # TUDO CERTO ATÉ AQUI ==================================================================================================
 
 
-def test_mlp(datasets, learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=10, batch_size=5, n_hidden=1):
+def test_mlp(datasets, learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000, batch_size=20, n_hidden=500):
     """
     Demonstrate stochastic gradient descent optimization for a multilayer
     perceptron
@@ -181,7 +181,7 @@ def test_mlp(datasets, learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=
     classifier = MLP(
         rng=rng,
         input=x,
-        n_in=28 * 28,
+        n_in=47,
         n_hidden=n_hidden,
         n_out=10
     )
@@ -331,3 +331,5 @@ def test_mlp(datasets, learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=
            os.path.split(__file__)[1] +
            ' ran for %.2fm' % ((end_time - start_time) / 60.)), file=sys.stderr)
 
+
+test_mlp(dataset)
