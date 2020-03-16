@@ -7,7 +7,7 @@ import numpy
 import theano
 import theano.tensor as T
 
-from logistic_sgd import LogisticRegression
+from logisticstudent import LogisticRegression
 
 
 class HiddenLayer(object):
