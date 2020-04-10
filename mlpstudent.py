@@ -1,7 +1,3 @@
-import os
-import sys
-import timeit
-
 import numpy
 
 import theano
@@ -167,4 +163,3 @@ class MLP(object):
 
         # keep track of model input
         self.input = input
-
