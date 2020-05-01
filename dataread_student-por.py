@@ -136,7 +136,3 @@ if __name__ == '__main__':
 # CNN ==================================================================================================================
 if __name__ == '__main__':
     evaluate_lenet5(dataset)
-
-
-def experiment(state, channel):
-    evaluate_lenet5(state.learning_rate, dataset=state.dataset)
