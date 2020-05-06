@@ -1,20 +1,20 @@
 # Continuacao do projeto PIBITI, agora utilizando mlp
 # imports ==============================================================================================================
 
+import matplotlib.pyplot as plt
 import numpy
 import pandas as pd
-
-import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.model_selection import train_test_split
-from sklearn.compose import ColumnTransformer
-from sklearn.impute import SimpleImputer
-from sklearn.pipeline import Pipeline
 import theano
 import theano.tensor as T
-from mlpstudent import test_mlp
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+
 from cnnstudent import evaluate_lenet5
+from mlpstudent import test_mlp
 
 # ======================================================================================================================
 # Read the data
