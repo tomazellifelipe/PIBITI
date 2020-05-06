@@ -8,7 +8,7 @@ import theano.tensor as T
 from theano.tensor.nnet import conv2d
 from theano.tensor.signal import pool
 
-from logisticstudent import LogisticRegression
+from logisticRegression import LogisticRegression
 from mlpstudent import HiddenLayer
 
 
