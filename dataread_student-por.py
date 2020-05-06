@@ -1,5 +1,6 @@
 # Continuacao do projeto PIBITI, agora utilizando mlp
 # imports ==============================================================================================================
+
 import numpy
 import pandas as pd
 
@@ -14,7 +15,6 @@ import theano
 import theano.tensor as T
 from mlpstudent import test_mlp
 from cnnstudent import evaluate_lenet5
-
 
 # ======================================================================================================================
 # Read the data

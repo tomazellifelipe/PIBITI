@@ -17,7 +17,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.feature_selection import VarianceThreshold
 from mlxtend.feature_selection import SequentialFeatureSelector
 
-#%%
+# %%
 # Read the data
 students_data = pd.read_csv('student-por.csv', sep=';', true_values=['yes'], false_values=['no'])
 students_data.sample(5)
@@ -167,7 +167,7 @@ feature_selector = SequentialFeatureSelector(RandomForestClassifier(),
                                              scoring='accuracy',
                                              cv=0)
 print('Random Forest Classifier')
-my_pipeline = Pipeline(steps=[('preprocessor', preprocessor),  ('model', models[1])])
+my_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', models[1])])
 my_pipeline.fit(X_train, Y_train)
 preds = my_pipeline.predict(X_valid)
 print("Confusion Matrix:\n", conf_matrix(preds, Y_valid))
@@ -203,13 +203,14 @@ print('End of model')
 
 #%%
 # Voting Classifier
-feature_selector = SequentialFeatureSelector(VotingClassifier(estimators=[('dt', model1), ('rf', model2), ('lr', model3)]),
-                                             n_jobs=-1,
-                                             k_features=15,
-                                             forward=True,
-                                             verbose=2,
-                                             scoring='accuracy',
-                                             cv=0)
+feature_selector = SequentialFeatureSelector(
+    VotingClassifier(estimators=[('dt', model1), ('rf', model2), ('lr', model3)]),
+    n_jobs=-1,
+    k_features=15,
+    forward=True,
+    verbose=2,
+    scoring='accuracy',
+    cv=0)
 print('Voting Classifier')
 my_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('features', feature_selector), ('model', models[3])])
 my_pipeline.fit(X_train, Y_train)
