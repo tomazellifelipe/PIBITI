@@ -109,18 +109,28 @@ feature_selector = SequentialFeatureSelector(DecisionTreeClassifier(criterion='e
 num_transformer = feature_selector.fit(X[students_num_cols], Y, custom_feature_names=students_num_cols)
 print(num_transformer.k_feature_names_)
 num_transformer = num_transformer.transform(X[students_num_cols])
+num_transformer = pd.DataFrame(num_transformer)
 
 #%%
 # Preprocessing for boolean data
 bool_transformer = VarianceThreshold(threshold=0.8 * (1 - 0.8))
 bool_transformer = bool_transformer.fit_transform(X[students_bool_cols])
+bool_transformer = pd.DataFrame(bool_transformer)
 
 # %%
 # Preprocessing for categorical data
-cat_transformer = OneHotEncoder(handle_unknown='ignore')
-cat_transformer = pd.DataFrame(cat_transformer.fit_transform(X[students_cat_cols]))
-cat_transformer.index = X.index
+cat_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))])
 
+# Bundle preprocessing for numerical and categorical data
+cat_transformer = ColumnTransformer(
+    transformers=[('cat', cat_transformer, students_cat_cols)])
+cat_transformer = pd.DataFrame(cat_transformer.fit_transform(X))
+
+#%%
+# X with all data transforms
+X = pd.concat([num_transformer, bool_transformer, cat_transformer], axis=1)
 # %%
 # Divide data into training and validation subsets
 X_train, X_valid, Y_train, Y_valid = train_test_split(X, Y, train_size=0.8, test_size=0.2, stratify=Y,
@@ -147,7 +157,7 @@ models = [model1, model2, model3, voting_clf]
 # %%
 # Decision Tree Classifier
 print('Decision Tree Classifier')
-my_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', models[0])])
+my_pipeline = Pipeline(steps=[('model', models[0])])
 my_pipeline.fit(X_train, Y_train)
 preds = my_pipeline.predict(X_valid)
 print("Confusion Matrix:\n", conf_matrix(preds, Y_valid))
@@ -162,7 +172,7 @@ print('End of model')
 # %%
 # Random Forest Classifier
 print('Random Forest Classifier')
-my_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', models[1])])
+my_pipeline = Pipeline(steps=[('model', models[1])])
 my_pipeline.fit(X_train, Y_train)
 preds = my_pipeline.predict(X_valid)
 print("Confusion Matrix:\n", conf_matrix(preds, Y_valid))
@@ -177,7 +187,7 @@ print('End of model')
 # %%
 # Logistic Regression
 print('Logistic Regression')
-my_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', models[2])])
+my_pipeline = Pipeline(steps=[('model', models[2])])
 my_pipeline.fit(X_train, Y_train)
 preds = my_pipeline.predict(X_valid)
 print("Confusion Matrix:\n", conf_matrix(preds, Y_valid))
@@ -192,7 +202,7 @@ print('End of model')
 # %%
 # Voting Classifier
 print('Voting Classifier')
-my_pipeline = Pipeline(steps=[('preprocessor', preprocessor), ('model', models[3])])
+my_pipeline = Pipeline(steps=[('model', models[3])])
 my_pipeline.fit(X_train, Y_train)
 preds = my_pipeline.predict(X_valid)
 print("Confusion Matrix:\n", conf_matrix(preds, Y_valid))
