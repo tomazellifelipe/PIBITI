@@ -21,7 +21,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 # %%
 # Read the data
-students_data = pd.read_csv('student-por.csv', sep=';', true_values=['yes'], false_values=['no'])
+students_data = pd.read_csv('student-por.csv', sep=';', true_values=['yes', 'F'], false_values=['no', 'M'])
 students_data.sample(5)
 
 
@@ -96,6 +96,31 @@ students_bool_cols = [cname for cname in X.columns if X[cname].dtype == "bool"]
 my_cols = students_cat_cols + students_num_cols + students_bool_cols
 X = X[my_cols].copy()
 
+#%%
+# Preprocessing for numerical data
+feature_selector = SequentialFeatureSelector(DecisionTreeClassifier(criterion='entropy'),
+                                             n_jobs=-1,
+                                             k_features='best',
+                                             forward=False,
+                                             verbose=0,
+                                             scoring='accuracy',
+                                             cv=5)
+
+num_transformer = feature_selector.fit(X[students_num_cols], Y, custom_feature_names=students_num_cols)
+print(num_transformer.k_feature_names_)
+num_transformer = num_transformer.transform(X[students_num_cols])
+
+#%%
+# Preprocessing for boolean data
+bool_transformer = VarianceThreshold(threshold=0.8 * (1 - 0.8))
+bool_transformer = bool_transformer.fit_transform(X[students_bool_cols])
+
+# %%
+# Preprocessing for categorical data
+cat_transformer = OneHotEncoder(handle_unknown='ignore')
+cat_transformer = pd.DataFrame(cat_transformer.fit_transform(X[students_cat_cols]))
+cat_transformer.index = X.index
+
 # %%
 # Divide data into training and validation subsets
 X_train, X_valid, Y_train, Y_valid = train_test_split(X, Y, train_size=0.8, test_size=0.2, stratify=Y,
@@ -107,32 +132,6 @@ print('Number of features: ', X_train.shape[1])
 print('Test Set:')
 print('Number of datapoints: ', X_valid.shape[0])
 print('Number of features: ', X_valid.shape[1])
-
-# %%
-feature_selector = SequentialFeatureSelector(DecisionTreeClassifier(criterion='entropy'),
-                                             n_jobs=-1,
-                                             k_features='best',
-                                             forward=False,
-                                             verbose=0,
-                                             scoring='roc_auc',
-                                             cv=5)
-# Preprocessing for numerical data
-numerical_transformer = Pipeline(steps=[('imputer', SimpleImputer(strategy='constant')),
-                                        ('filter', feature_selector)])
-# Preprocessing for boolean data
-boolean_transformer = VarianceThreshold(threshold=0.8 * (1 - 0.8))
-
-# Preprocessing for categorical data
-categorical_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='most_frequent')),
-    ('onehot', OneHotEncoder(handle_unknown='ignore'))])
-
-# Bundle preprocessing for numerical and categorical data
-preprocessor = ColumnTransformer(
-    transformers=[
-        ('num', numerical_transformer, students_num_cols),
-        ('cat', categorical_transformer, students_cat_cols),
-        ('bool', 'passthrough', students_bool_cols)])
 
 # %%
 # Choose model
