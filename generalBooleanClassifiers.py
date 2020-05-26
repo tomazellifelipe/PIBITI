@@ -96,13 +96,13 @@ students_bool_cols = [cname for cname in X.columns if X[cname].dtype == "bool"]
 my_cols = students_cat_cols + students_num_cols + students_bool_cols
 X = X[my_cols].copy()
 
-#%%
+# %%
 # Preprocessing for numerical data
 feature_selector = SequentialFeatureSelector(DecisionTreeClassifier(criterion='entropy'),
                                              n_jobs=-1,
                                              k_features='best',
                                              forward=False,
-                                             verbose=0,
+                                             verbose=2,
                                              scoring='accuracy',
                                              cv=5)
 
@@ -111,7 +111,7 @@ print(num_transformer.k_feature_names_)
 num_transformer = num_transformer.transform(X[students_num_cols])
 num_transformer = pd.DataFrame(num_transformer)
 
-#%%
+# %%
 # Preprocessing for boolean data
 bool_transformer = VarianceThreshold(threshold=0.8 * (1 - 0.8))
 bool_transformer = bool_transformer.fit_transform(X[students_bool_cols])
@@ -126,11 +126,12 @@ cat_transformer = Pipeline(steps=[
 # Bundle preprocessing for numerical and categorical data
 cat_transformer = ColumnTransformer(
     transformers=[('cat', cat_transformer, students_cat_cols)])
-cat_transformer = pd.DataFrame(cat_transformer.fit_transform(X))
+cat_transformer = pd.DataFrame(cat_transformer.fit_transform(X[students_cat_cols]))
 
-#%%
+# %%
 # X with all data transforms
 X = pd.concat([num_transformer, bool_transformer, cat_transformer], axis=1)
+
 # %%
 # Divide data into training and validation subsets
 X_train, X_valid, Y_train, Y_valid = train_test_split(X, Y, train_size=0.8, test_size=0.2, stratify=Y,
