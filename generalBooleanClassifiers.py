@@ -1,5 +1,3 @@
-# %%
-# testing branch on git and pycharm
 # %% md
 # pibit empresa 'SELEÇÃO DE CARACTERÍSTICAS PARA PREVISÃO DO DESEMPENHO DE ALUNOS EM CURSOS DE EAD'
 # %%
@@ -100,22 +98,26 @@ X = X[my_cols].copy()
 # Preprocessing for numerical data
 feature_selector = SequentialFeatureSelector(DecisionTreeClassifier(criterion='entropy'),
                                              n_jobs=-1,
-                                             k_features='best',
+                                             k_features=8,
                                              forward=False,
-                                             verbose=2,
+                                             verbose=0,
                                              scoring='accuracy',
                                              cv=5)
 
 num_transformer = feature_selector.fit(X[students_num_cols], Y, custom_feature_names=students_num_cols)
-print(num_transformer.k_feature_names_)
+num_transf_features = list(num_transformer.k_feature_names_)
 num_transformer = num_transformer.transform(X[students_num_cols])
-num_transformer = pd.DataFrame(num_transformer)
+num_transformer = pd.DataFrame(num_transformer, columns=num_transf_features)
+
 
 # %%
-# Preprocessing for boolean data
-bool_transformer = VarianceThreshold(threshold=0.8 * (1 - 0.8))
-bool_transformer = bool_transformer.fit_transform(X[students_bool_cols])
-bool_transformer = pd.DataFrame(bool_transformer)
+def variance_threshold_selector(data, threshold=0.8 * (1 - 0.8)):
+    selector = VarianceThreshold(threshold=threshold)
+    selector.fit(data)
+    return data[data.columns[selector.get_support(indices=True)]]
+
+
+bool_transformer = variance_threshold_selector(X[students_bool_cols])
 
 # %%
 # Preprocessing for categorical data
