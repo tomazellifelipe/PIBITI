@@ -94,12 +94,26 @@ students_bool_cols = [cname for cname in X.columns if X[cname].dtype == "bool"]
 my_cols = students_cat_cols + students_num_cols + students_bool_cols
 X = X[my_cols].copy()
 
+
+# %%
+def features_selections(data, featuretype, default=Y):
+    selector = featuretype
+    selector.fit(data, default)
+    return data[data.columns[selector.get_support(indices=True)]]
+
+
 # %%
 # Preprocessing for numerical data
+num_transformer = features_selections(X[students_num_cols], SelectKBest(chi2, k=8))
+# num_transformer = features_selections(X[students_num_cols], SelectKBest(f_classif, k=8))
+# num_transformer = features_selections(X[students_num_cols], SelectKBest(mutual_info_classif, k=8))
+
+# %%
+# Preprocessing for numerical data with foward or backward selection
 feature_selector = SequentialFeatureSelector(DecisionTreeClassifier(criterion='entropy'),
                                              n_jobs=-1,
                                              k_features=8,
-                                             forward=False,
+                                             forward=True,
                                              verbose=0,
                                              scoring='accuracy',
                                              cv=5)
@@ -109,15 +123,9 @@ num_transf_features = list(num_transformer.k_feature_names_)
 num_transformer = num_transformer.transform(X[students_num_cols])
 num_transformer = pd.DataFrame(num_transformer, columns=num_transf_features)
 
-
 # %%
-def variance_threshold_selector(data, threshold=0.8 * (1 - 0.8)):
-    selector = VarianceThreshold(threshold=threshold)
-    selector.fit(data)
-    return data[data.columns[selector.get_support(indices=True)]]
-
-
-bool_transformer = variance_threshold_selector(X[students_bool_cols])
+# Preprocessing for boolean data
+bool_transformer = features_selections(X[students_bool_cols], VarianceThreshold(threshold=0.8 * (1 - 0.8)))
 
 # %%
 # Preprocessing for categorical data
@@ -132,11 +140,11 @@ cat_transformer = pd.DataFrame(cat_transformer.fit_transform(X[students_cat_cols
 
 # %%
 # X with all data transforms
-X = pd.concat([num_transformer, bool_transformer, cat_transformer], axis=1)
+X_features = pd.concat([num_transformer, bool_transformer, cat_transformer], axis=1)
 
 # %%
 # Divide data into training and validation subsets
-X_train, X_valid, Y_train, Y_valid = train_test_split(X, Y, train_size=0.8, test_size=0.2, stratify=Y,
+X_train, X_valid, Y_train, Y_valid = train_test_split(X_features, Y, train_size=0.8, test_size=0.2, stratify=Y,
                                                       shuffle=True)
 # Get shape of test and training sets
 print('Training Set:')
